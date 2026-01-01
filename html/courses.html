@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - Courses</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <link rel="stylesheet" href="/css/courses.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fa-solid fa-brain nav-logo-icon"></i>
+                <span class="nav-brand-text">GeniusGuide</span>
+            </div>
+            
+            <div class="nav-search">
+                <i class="fas fa-search nav-search-icon"></i>
+                <input type="text" class="nav-search-input" placeholder="Search courses...">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="courses.html" class="nav-link active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="quiz.html" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quizzes</span>
+                </a>
+                <a href="progress.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Progress</span>
+                </a>
+                <div class="nav-user">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-dropdown">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Loading...</div>
+                            <div class="user-email" id="userEmail">Loading...</div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="profile.html" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="settings.html" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button id="logoutBtn" class="dropdown-item logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="courses-page">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 class="welcome-title">Welcome back, <span id="displayUserName">Learner</span>! 👋</h1>
+            <p class="welcome-subtitle">Continue your learning journey or explore new topics</p>
+            
+            <div class="progress-summary">
+                <div class="progress-card">
+                    <div class="progress-icon" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-value" id="enrolledCourses">12</div>
+                        <div class="progress-label">Courses Enrolled</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-value" id="completedCourses">8</div>
+                        <div class="progress-label">Completed</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-value" id="inProgress">4</div>
+                        <div class="progress-label">In Progress</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="progress-content">
+                        <div class="progress-value" id="streakDays">14</div>
+                        <div class="progress-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Grid -->
+        <section class="courses-section">
+            <div class="section-header">
+                <h2 class="section-title">Recommended Courses</h2>
+                <div class="section-actions">
+                    <div class="filter-dropdown">
+                        <button class="filter-btn">
+                            <i class="fas fa-filter"></i>
+                            <span>Filter by Category</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="filter-menu">
+                            <button class="filter-option active" data-category="all">All Courses</button>
+                            <button class="filter-option" data-category="programming">Programming</button>
+                            <button class="filter-option" data-category="science">Science</button>
+                            <button class="filter-option" data-category="design">Design</button>
+                        </div>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="courses-grid" id="coursesContainer">
+                <!-- Courses will be loaded by JavaScript -->
+            </div>
+
+            <div class="load-more">
+                <button id="loadMoreBtn" class="load-more-btn">
+                    <i class="fas fa-sync-alt"></i>
+                    Load More Courses
+                </button>
+            </div>
+        </section>
+
+        <!-- Continue Learning Section -->
+        <section class="continue-section">
+            <h2 class="section-title">Continue Learning</h2>
+            <div class="continue-courses" id="continueContainer">
+                <!-- Continue courses will be loaded by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <i class="fa-solid fa-brain footer-logo-icon"></i>
+                <span class="footer-brand-text">GeniusGuide</span>
+            </div>
+            <div class="footer-links">
+                <a href="about.html" class="footer-link">About Us</a>
+                <a href="contact.html" class="footer-link">Contact</a>
+                <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                <a href="terms.html" class="footer-link">Terms of Service</a>
+                <a href="help.html" class="footer-link">Help Center</a>
+            </div>
+            <div class="footer-copyright">
+                © 2024 GeniusGuide. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="/javascript/utils.js"></script>
+    <script src="/javascript/courses.js"></script>
+    
+    <script>
+        // Check if user is logged in
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Load user data
+        document.addEventListener('DOMContentLoaded', function() {
+            const userEmail = localStorage.getItem('userEmail') || 'learner@geniusguide.com';
+            const userName = userEmail.split('@')[0];
+            
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userEmail').textContent = userEmail;
+            document.getElementById('displayUserName').textContent = userName;
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('rememberMe');
+                localStorage.removeItem('courseProgress'); // Clear course progress
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

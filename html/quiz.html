@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - Quiz Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons --> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Quiz CSS -->
+    <link rel="stylesheet" href="/css/quiz.css">
+    <!-- Quiz Taking CSS -->
+     <link rel="stylesheet" href="/css/quiz_taking.css">
+     <!-- QUIZ DASHBOARD CSS -->
+      <link rel="stylesheet" href="/css/dashboard.css">
+      <!-- MODAL CSS -->
+       <link rel="stylesheet" href="/css/modal.css">
+       <!-- AUTH CSS -->
+        <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="quiz-body">
+    <!-- Simple Header -->
+    <header class="quiz-header">
+        <div class="quiz-nav">
+            <div class="nav-left">
+                <i class="fa-solid fa-brain logo-icon"></i>
+                <span class="logo-text">GeniusGuide</span>
+                <span class="page-title">Quizzes</span>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff" alt="Avatar" class="user-avatar-small">
+                    <span>John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <a href="index.php" class="btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+<!-- Main Content -->
+<!-- Main Content -->
+<main class="quiz-main">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1 class="greeting">Quiz Dashboard</h1>
+        <p class="date-display">Test your knowledge and track your progress</p>
+    </div>
+
+    <!-- Quiz Stats -->
+    <div class="stats-grid">
+        <!-- 4 stat cards here -->
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="quick-nav">
+        <!-- Navigation buttons -->
+    </div>
+
+    <!-- Quiz Filter Tabs -->
+    <div class="quiz-filter-tabs">
+        <!-- Filter tabs -->
+    </div>
+
+    <!-- Quiz Grid Header -->
+    <div class="section-header">
+        <h2>Available Quizzes</h2>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search quizzes..." id="quizSearch">
+        </div>
+    </div>
+
+    <!-- Quiz Grid - 3 CARDS PER ROW -->
+    <div class="quizzes-grid" id="quizzesGrid">
+        <!-- Quizzes will be loaded here -->
+    </div>
+
+    <!-- Sidebar Content BELOW the cards -->
+    <div class="sidebar-content">
+        <!-- Upcoming Quizzes Widget -->
+        <div class="sidebar-widget">
+            <h3><i class="fas fa-calendar-alt"></i> Upcoming Quizzes</h3>
+            <div class="upcoming-list">
+                <div class="upcoming-item">
+                    <div class="upcoming-date">
+                        <span class="date-day">25</span>
+                        <span class="date-month">DEC</span>
+                    </div>
+                    <div class="upcoming-info">
+                        <h4>Database Systems</h4>
+                        <p>SQL & NoSQL Fundamentals</p>
+                        <span class="upcoming-difficulty medium">Medium</span>
+                    </div>
+                </div>
+                <div class="upcoming-item">
+                    <div class="upcoming-date">
+                        <span class="date-day">28</span>
+                        <span class="date-month">DEC</span>
+                    </div>
+                    <div class="upcoming-info">
+                        <h4>Machine Learning</h4>
+                        <p>Algorithms & Models</p>
+                        <span class="upcoming-difficulty hard">Hard</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Widget -->
+        <div class="sidebar-widget">
+            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            <div class="quick-actions-grid">
+                <button class="action-btn">
+                    <i class="fas fa-random"></i>
+                    Random Quiz
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-history"></i>
+                    Review History
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-download"></i>
+                    Download Results
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-share-alt"></i>
+                    Share Progress
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+    <!-- JavaScript -->
+     <!-- Main JS Displaying Cards  -->
+    <script src="/javascript/quiz.js"></script>
+    <!-- Quiz Api Javascript -->
+    <script src="/javascript/quiz_api.js"></script>
+    <!-- Utils JS -->
+    <script src="/javascript/utils.js"></script>
+    <!-- Quiz Dashboard JS -->
+    <script src="/javascript/quiz_dashboard.js"></script>
+    <!-- Quiz Taking JS -->
+    <script src="/javascript/quiz_taking.js"></script>
+    <!-- Add this before your existing scripts -->
+<script src="quiz_functions.js"></script>
+
+<!-- Then add this script after including quiz_functions.js -->
+<script>
+    // Initialize quiz functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make sure all quiz cards have data-id attributes
+        document.querySelectorAll('.quiz-card').forEach((card, index) => {
+            card.dataset.id = index + 1;
+            
+            // Add data-id to buttons if not present
+            const startBtn = card.querySelector('.start-btn');
+            const retakeBtn = card.querySelector('.retake-btn');
+            const detailsBtn = card.querySelector('.details-btn');
+            
+            if (startBtn) startBtn.dataset.id = index + 1;
+            if (retakeBtn) retakeBtn.dataset.id = index + 1;
+            if (detailsBtn) detailsBtn.dataset.id = index + 1;
+        });
+        
+        // Initialize search functionality
+        const searchInput = document.getElementById('quizSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const quizzes = document.querySelectorAll('.quiz-card');
+                
+                quizzes.forEach(quiz => {
+                    const title = quiz.querySelector('.quiz-title').textContent.toLowerCase();
+                    const subtitle = quiz.querySelector('.quiz-subtitle').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || subtitle.includes(searchTerm)) {
+                        quiz.style.display = 'block';
+                    } else {
+                        quiz.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Add active class to first filter tab
+        const firstTab = document.querySelector('.filter-tab');
+        if (firstTab) firstTab.classList.add('active');
+    });
+</script>
+</body>
+</html>

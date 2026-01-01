@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - My Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/quiz.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--water-blue);
+            object-fit: cover;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .profile-email {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--water-blue);
+            display: block;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .profile-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+        
+        .profile-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .profile-nav {
+            background: var(--dark-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .profile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .profile-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        
+        .profile-nav-item.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--water-blue);
+            border-left-color: var(--water-blue);
+        }
+        
+        .profile-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .profile-section {
+            background: var(--dark-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-input {
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--water-blue);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+        
+        .form-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .badge-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .badge-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--water-blue);
+        }
+        
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--water-blue);
+        }
+        
+        .badge-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .badge-description {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .quiz-history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .quiz-history-table th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .quiz-history-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+        
+        .quiz-history-table tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .score-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .score-high {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .score-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .score-low {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        
+        @media (max-width: 900px) {
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="quiz-body">
+    <!-- Header -->
+    <header class="quiz-header">
+        <div class="quiz-nav">
+            <div class="nav-left">
+                <i class="fa-solid fa-brain logo-icon"></i>
+                <span class="logo-text">GeniusGuide</span>
+                <span class="page-title">My Profile</span>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff" 
+                         alt="Avatar" 
+                         class="user-avatar-small">
+                    <span>John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <a href="quiz.html" class="btn-outline">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff&size=200" 
+                 alt="Profile" 
+                 class="profile-avatar">
+            
+            <div class="profile-info">
+                <h1 class="profile-name">John Doe</h1>
+                <p class="profile-email">john.doe@example.com</p>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span class="stat-value">15</span>
+                        <span class="stat-label">Quizzes Taken</span>
+                    </div>
+                    
+                    <div class="profile-stat">
+                        <span class="stat-value">85%</span>
+                        <span class="stat-label">Average Score</span>
+                    </div>
+                    
+                    <div class="profile-stat">
+                        <span class="stat-value">7</span>
+                        <span class="stat-label">Day Streak</span>
+                    </div>
+                    
+                    <div class="profile-stat">
+                        <span class="stat-value">Gold</span>
+                        <span class="stat-label">Rank</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="editProfileBtn" class="btn-primary">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </button>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <nav class="profile-nav">
+                    <a href="#personal" class="profile-nav-item active">
+                        <i class="fas fa-user"></i>
+                        Personal Information
+                    </a>
+                    <a href="#achievements" class="profile-nav-item">
+                        <i class="fas fa-trophy"></i>
+                        Achievements
+                    </a>
+                    <a href="#history" class="profile-nav-item">
+                        <i class="fas fa-history"></i>
+                        Quiz History
+                    </a>
+                    <a href="#settings" class="profile-nav-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="#security" class="profile-nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        Security
+                    </a>
+                </nav>
+                
+                <div class="dashboard-widget">
+                    <div class="widget-header">
+                        <h3 class="widget-title">
+                            <i class="fas fa-chart-line"></i>
+                            Quick Stats
+                        </h3>
+                    </div>
+                    
+                    <div class="quick-stats-grid">
+                        <div class="quick-stat">
+                            <i class="fas fa-brain"></i>
+                            <span class="quick-stat-value">Level 3</span>
+                            <span class="quick-stat-label">Current Level</span>
+                        </div>
+                        
+                        <div class="quick-stat">
+                            <i class="fas fa-star"></i>
+                            <span class="quick-stat-value">1,250</span>
+                            <span class="quick-stat-label">XP Points</span>
+                        </div>
+                        
+                        <div class="quick-stat">
+                            <i class="fas fa-clock"></i>
+                            <span class="quick-stat-value">24h</span>
+                            <span class="quick-stat-label">Time Spent</span>
+                        </div>
+                        
+                        <div class="quick-stat">
+                            <i class="fas fa-medal"></i>
+                            <span class="quick-stat-value">8</span>
+                            <span class="quick-stat-label">Badges</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="profile-main">
+                <!-- Personal Information Section -->
+                <section id="personal" class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Personal Information
+                    </h2>
+                    
+                    <form id="personalInfoForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       id="firstName"
+                                       value="John"
+                                       disabled>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       id="lastName"
+                                       value="Doe"
+                                       disabled>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" 
+                                   class="form-input" 
+                                   id="email"
+                                   value="john.doe@example.com"
+                                   disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-input" 
+                                      id="bio"
+                                      rows="4"
+                                      placeholder="Tell us about yourself..."
+                                      disabled>Passionate learner exploring the world of programming and data science. Currently mastering Python and Machine Learning.</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       id="location"
+                                       value="San Francisco, CA"
+                                       disabled>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Website</label>
+                                <input type="url" 
+                                       class="form-input" 
+                                       id="website"
+                                       value="https://johndoe.dev"
+                                       disabled>
+                            </div>
+                        </div>
+                        
+                        <div id="saveButtonContainer" style="display: none; margin-top: 1.5rem;">
+                            <button type="button" id="cancelEditBtn" class="btn-outline">
+                                Cancel
+                            </button>
+                            <button type="submit" id="saveChangesBtn" class="btn-primary">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Achievements Section (Initially Hidden) -->
+                <section id="achievements" class="profile-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        Achievements & Badges
+                    </h2>
+                    
+                    <div class="badge-grid">
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="badge-name">Quick Starter</div>
+                            <div class="badge-description">Complete your first quiz</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="badge-name">Fast Learner</div>
+                            <div class="badge-description">Score 90%+ on any quiz</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="badge-name">Consistent</div>
+                            <div class="badge-description">7-day streak</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="badge-name">Top Performer</div>
+                            <div class="badge-description">Top 10 on leaderboard</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="badge-name">Scholar</div>
+                            <div class="badge-description">Complete 10 quizzes</div>
+                        </div>
+                        
+                        <div class="badge-item">
+                            <div class="badge-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="badge-name">Time Master</div>
+                            <div class="badge-description">Complete quiz in half time</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quiz History Section (Initially Hidden) -->
+                <section id="history" class="profile-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Quiz History
+                    </h2>
+                    
+                    <table class="quiz-history-table">
+                        <thead>
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Date</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quizHistoryBody">
+                            <!-- Quiz history will be loaded here -->
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Settings Section (Initially Hidden) -->
+                <section id="settings" class="profile-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Account Settings
+                    </h2>
+                    
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label class="form-label">Email Notifications</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked>
+                                    <span>Quiz reminders</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked>
+                                    <span>Progress reports</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox">
+                                    <span>Marketing emails</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked>
+                                    <span>Community updates</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Default Quiz Settings</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked>
+                                    <span>Show timer during quizzes</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox">
+                                    <span>Shuffle questions</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox" checked>
+                                    <span>Show explanations after quiz</span>
+                                </label>
+                                
+                                <label style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <input type="checkbox">
+                                    <span>Enable sound effects</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Theme</label>
+                            <select class="form-input">
+                                <option value="dark">Dark Theme</option>
+                                <option value="light">Light Theme</option>
+                                <option value="system">System Default</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="margin-top: 1.5rem;">
+                            Save Settings
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Security Section (Initially Hidden) -->
+                <section id="security" class="profile-section" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Security
+                    </h2>
+                    
+                    <form id="securityForm">
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" 
+                                   class="form-input" 
+                                   placeholder="Enter current password">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" 
+                                       class="form-input" 
+                                       placeholder="Enter new password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" 
+                                       class="form-input" 
+                                       placeholder="Confirm new password">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="margin-top: 1.5rem;">
+                            Change Password
+                        </button>
+                    </form>
+                    
+                    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Danger Zone
+                        </h3>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                                    Delete Account
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    Permanently delete your account and all associated data.
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="deleteAccountBtn" class="btn-outline" style="color: #ef4444; border-color: #ef4444;">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/javascript/utils.js"></script>
+    <script src="/javascript/quiz_api.js"></script>
+    <script>
+        // DOM Elements
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const saveButtonContainer = document.getElementById('saveButtonContainer');
+        const profileNavItems = document.querySelectorAll('.profile-nav-item');
+        const profileSections = document.querySelectorAll('.profile-section');
+        const quizHistoryBody = document.getElementById('quizHistoryBody');
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        
+        // Navigation
+        profileNavItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active nav item
+                profileNavItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const targetId = this.getAttribute('href').substring(1);
+                profileSections.forEach(section => {
+                    section.style.display = section.id === targetId ? 'block' : 'none';
+                });
+            });
+        });
+        
+        // Edit profile functionality
+        editProfileBtn.addEventListener('click', function() {
+            // Enable all form inputs
+            const formInputs = document.querySelectorAll('#personalInfoForm .form-input');
+            formInputs.forEach(input => input.disabled = false);
+            
+            // Show save/cancel buttons
+            saveButtonContainer.style.display = 'block';
+            
+            // Hide edit button
+            this.style.display = 'none';
+        });
+        
+        cancelEditBtn.addEventListener('click', function() {
+            // Disable all form inputs
+            const formInputs = document.querySelectorAll('#personalInfoForm .form-input');
+            formInputs.forEach(input => input.disabled = true);
+            
+            // Hide save/cancel buttons
+            saveButtonContainer.style.display = 'none';
+            
+            // Show edit button
+            editProfileBtn.style.display = 'inline-flex';
+            
+            // Reset form values (in a real app, you would fetch from server)
+            document.getElementById('firstName').value = 'John';
+            document.getElementById('lastName').value = 'Doe';
+            document.getElementById('email').value = 'john.doe@example.com';
+            document.getElementById('bio').value = 'Passionate learner exploring the world of programming and data science. Currently mastering Python and Machine Learning.';
+            document.getElementById('location').value = 'San Francisco, CA';
+            document.getElementById('website').value = 'https://johndoe.dev';
+        });
+        
+        // Save profile changes
+        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            saveChangesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveChangesBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Disable all form inputs
+                const formInputs = document.querySelectorAll('#personalInfoForm .form-input');
+                formInputs.forEach(input => input.disabled = true);
+                
+                // Hide save/cancel buttons
+                saveButtonContainer.style.display = 'none';
+                
+                // Show edit button
+                editProfileBtn.style.display = 'inline-flex';
+                
+                // Show success message
+                showNotification('Profile updated successfully!', 'success');
+                
+                // Update avatar if name changed
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const fullName = `${firstName} ${lastName}`;
+                
+                // Update avatar in header
+                document.querySelectorAll('.user-avatar-small').forEach(avatar => {
+                    avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=38bdf8&color=fff`;
+                });
+                
+                // Update profile avatar
+                document.querySelector('.profile-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=38bdf8&color=fff&size=200`;
+                
+                // Update profile name
+                document.querySelector('.profile-name').textContent = fullName;
+                document.querySelectorAll('.user-menu span').forEach(span => {
+                    span.textContent = fullName;
+                });
+                
+            }, 1500);
+        });
+        
+        // Load quiz history
+        async function loadQuizHistory() {
+            try {
+                // Get quiz history from API
+                const response = await API.getQuizzes({ completed: true });
+                
+                if (response.success && response.data.length > 0) {
+                    let historyHTML = '';
+                    
+                    response.data.slice(0, 10).forEach(quiz => {
+                        const scoreClass = quiz.bestScore >= 80 ? 'score-high' : 
+                                          quiz.bestScore >= 60 ? 'score-medium' : 'score-low';
+                        
+                        historyHTML += `
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary);">
+                                        ${quiz.title}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                        ${quiz.subtitle}
+                                    </div>
+                                </td>
+                                <td>${new Date(quiz.lastAttempt).toLocaleDateString()}</td>
+                                <td>
+                                    <span class="score-badge ${scoreClass}">
+                                        ${quiz.bestScore}%
+                                    </span>
+                                </td>
+                                <td>${quiz.time} min</td>
+                                <td>
+                                    <a href="take-quiz.html?id=${quiz.id}" 
+                                       class="btn-outline" 
+                                       style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                        Retake
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    quizHistoryBody.innerHTML = historyHTML;
+                } else {
+                    quizHistoryBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                No quiz history yet. Start by taking your first quiz!
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading quiz history:', error);
+                quizHistoryBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            Failed to load quiz history. Please try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Delete account confirmation
+        deleteAccountBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone. All your data will be permanently deleted.')) {
+                // Show loading state
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                this.disabled = true;
+                
+                // Simulate account deletion
+                setTimeout(() => {
+                    // Clear local storage
+                    localStorage.clear();
+                    
+                    // Redirect to home page
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        });
+        
+        // Settings form submission
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                showNotification('Settings saved successfully!', 'success');
+            }, 1500);
+        });
+        
+        // Security form submission
+        document.getElementById('securityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const currentPassword = this.querySelector('input[type="password"]').value;
+            const newPassword = this.querySelectorAll('input[type="password"]')[1].value;
+            const confirmPassword = this.querySelectorAll('input[type="password"]')[2].value;
+            
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showNotification('New password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                this.reset();
+                showNotification('Password changed successfully!', 'success');
+            }, 1500);
+        });
+        
+        // Notification function
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `auth-message ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} auth-message-icon"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // Add CSS for animations
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    
+                    @keyframes slideOut {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Check if user is logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        
+        // Initialize
+        window.addEventListener('load', function() {
+            loadQuizHistory();
+        });
+    </script>
+</body>
+</html>

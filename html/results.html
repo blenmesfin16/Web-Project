@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - Quiz Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/quiz.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    
+    <style>
+        .results-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .score-display {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+        }
+        
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .result-stat {
+            background: var(--dark-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .result-stat:hover {
+            transform: translateY(-5px);
+            border-color: var(--water-blue);
+        }
+        
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--water-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .results-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .result-btn {
+            padding: 1rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: none;
+            min-width: 180px;
+            justify-content: center;
+            text-decoration: none;
+        }
+        
+        .result-btn.primary {
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: white;
+        }
+        
+        .result-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        .result-btn.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .question-review {
+            margin-top: 3rem;
+        }
+        
+        .review-item {
+            background: var(--dark-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .review-item.correct {
+            border-left: 4px solid #10b981;
+        }
+        
+        .review-item.incorrect {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .review-question {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .review-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .review-option {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .review-option.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .review-option.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .review-option.selected {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--water-blue);
+        }
+        
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .review-explanation {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body class="quiz-body">
+    <!-- Header -->
+    <header class="quiz-header">
+        <div class="quiz-nav">
+            <div class="nav-left">
+                <i class="fa-solid fa-brain logo-icon"></i>
+                <span class="logo-text">GeniusGuide</span>
+                <span class="page-title">Quiz Results</span>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff" 
+                         alt="Avatar" 
+                         class="user-avatar-small">
+                    <span>John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <a href="quiz.html" class="btn-outline">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="results-container">
+        <!-- Results Header -->
+        <div class="results-header">
+            <div class="score-display">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="none" 
+                            stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+                    <circle id="scoreCircle" cx="100" cy="100" r="90" fill="none" 
+                            stroke="url(#gradient)" stroke-width="10" 
+                            stroke-linecap="round" stroke-dasharray="565.48" 
+                            stroke-dashoffset="565.48"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:var(--purple);" />
+                            <stop offset="100%" style="stop-color:var(--water-blue);" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div id="scorePercentage" style="font-size: 3rem; font-weight: 700; color: var(--water-blue);">
+                        85%
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Score</div>
+                </div>
+            </div>
+            
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                Quiz Completed!
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                Great job! Here's how you performed.
+            </p>
+        </div>
+
+        <!-- Results Stats -->
+        <div class="results-stats">
+            <div class="result-stat">
+                <div id="pointsEarned" class="result-value">170/200</div>
+                <div class="result-label">Points Earned</div>
+            </div>
+            
+            <div class="result-stat">
+                <div id="correctAnswers" class="result-value">17/20</div>
+                <div class="result-label">Correct Answers</div>
+            </div>
+            
+            <div class="result-stat">
+                <div id="timeTaken" class="result-value">24:30</div>
+                <div class="result-label">Time Taken</div>
+            </div>
+            
+            <div class="result-stat">
+                <div id="accuracy" class="result-value">85%</div>
+                <div class="result-label">Accuracy</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="results-actions">
+            <a href="quiz.html" class="result-btn secondary">
+                <i class="fas fa-home"></i>
+                Back to Dashboard
+            </a>
+            
+            <button id="reviewBtn" class="result-btn primary">
+                <i class="fas fa-chart-bar"></i>
+                Review Answers
+            </button>
+            
+            <a id="retakeLink" href="take-quiz.html?id=1" class="result-btn success">
+                <i class="fas fa-redo"></i>
+                Retake Quiz
+            </a>
+        </div>
+
+        <!-- Question Review (Initially Hidden) -->
+        <div id="questionReview" class="question-review" style="display: none;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--text-primary);">
+                <i class="fas fa-list-check"></i>
+                Question Review
+            </h2>
+            
+            <div id="reviewContainer">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button id="hideReviewBtn" class="result-btn secondary">
+                    <i class="fas fa-eye-slash"></i>
+                    Hide Review
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/javascript/utils.js"></script>
+    <script src="quiz_api.js"></script>
+    <script>
+        // Get results from localStorage
+        const results = JSON.parse(localStorage.getItem('quizResults') || '{}');
+        const quizId = new URLSearchParams(window.location.search).get('quizId') || 1;
+        
+        // DOM Elements
+        const scoreCircle = document.getElementById('scoreCircle');
+        const scorePercentage = document.getElementById('scorePercentage');
+        const pointsEarned = document.getElementById('pointsEarned');
+        const correctAnswers = document.getElementById('correctAnswers');
+        const timeTaken = document.getElementById('timeTaken');
+        const accuracy = document.getElementById('accuracy');
+        const reviewBtn = document.getElementById('reviewBtn');
+        const hideReviewBtn = document.getElementById('hideReviewBtn');
+        const questionReview = document.getElementById('questionReview');
+        const reviewContainer = document.getElementById('reviewContainer');
+        const retakeLink = document.getElementById('retakeLink');
+        
+        // Initialize results
+        function initializeResults() {
+            if (!results || !results.percentage) {
+                // Demo data if no results found
+                showDemoResults();
+                return;
+            }
+            
+            // Update score circle
+            const circumference = 565.48;
+            const offset = circumference - (circumference * results.percentage / 100);
+            scoreCircle.style.strokeDashoffset = offset;
+            
+            // Update score percentage
+            scorePercentage.textContent = `${results.percentage}%`;
+            
+            // Update points earned
+            pointsEarned.textContent = `${results.score}/${results.totalPoints}`;
+            
+            // Calculate correct answers
+            const correctCount = results.results ? 
+                results.results.filter(r => r.isCorrect).length : 
+                Math.round(results.percentage / 100 * 20);
+            const totalQuestions = results.results ? results.results.length : 20;
+            correctAnswers.textContent = `${correctCount}/${totalQuestions}`;
+            
+            // Update time taken (use actual if available, otherwise demo)
+            if (results.timeTaken) {
+                const minutes = Math.floor(results.timeTaken / 60);
+                const seconds = results.timeTaken % 60;
+                timeTaken.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                timeTaken.textContent = '24:30'; // Demo time
+            }
+            
+            // Update accuracy
+            accuracy.textContent = `${results.percentage}%`;
+            
+            // Update retake link
+            retakeLink.href = `take-quiz.html?id=${quizId}`;
+        }
+        
+        // Show demo results (for testing)
+        function showDemoResults() {
+            const demoPercentage = 85;
+            const circumference = 565.48;
+            const offset = circumference - (circumference * demoPercentage / 100);
+            
+            scoreCircle.style.strokeDashoffset = offset;
+            scorePercentage.textContent = `${demoPercentage}%`;
+            pointsEarned.textContent = '170/200';
+            correctAnswers.textContent = '17/20';
+            timeTaken.textContent = '24:30';
+            accuracy.textContent = `${demoPercentage}%`;
+            retakeLink.href = `take-quiz.html?id=${quizId}`;
+        }
+        
+        // Toggle question review
+        reviewBtn.addEventListener('click', async function() {
+            if (questionReview.style.display === 'none') {
+                await loadQuestionReview();
+                questionReview.style.display = 'block';
+                reviewBtn.style.display = 'none';
+            } else {
+                questionReview.style.display = 'none';
+                reviewBtn.style.display = 'flex';
+            }
+        });
+        
+        hideReviewBtn.addEventListener('click', function() {
+            questionReview.style.display = 'none';
+            reviewBtn.style.display = 'flex';
+        });
+        
+        // Load question review
+        async function loadQuestionReview() {
+            try {
+                // Get questions
+                const questionsResponse = await API.getQuizQuestions(quizId);
+                if (!questionsResponse.success) {
+                    reviewContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Failed to load questions.</p>';
+                    return;
+                }
+                
+                const questions = questionsResponse.data;
+                
+                // Get user answers from results
+                const userAnswers = results.answers || {};
+                const resultsData = results.results || [];
+                
+                // Generate review HTML
+                let reviewHTML = '';
+                
+                questions.forEach((question, index) => {
+                    const userAnswer = userAnswers[question.id] !== undefined ? userAnswers[question.id] : -1;
+                    const result = resultsData.find(r => r.questionId === question.id);
+                    const isCorrect = result ? result.isCorrect : (userAnswer === question.correctAnswer);
+                    
+                    reviewHTML += `
+                        <div class="review-item ${isCorrect ? 'correct' : 'incorrect'}">
+                            <div class="review-question">
+                                Q${index + 1}: ${question.question}
+                            </div>
+                            
+                            <div class="review-options">
+                    `;
+                    
+                    // Add options
+                    question.options.forEach((option, optionIndex) => {
+                        let optionClass = 'review-option';
+                        let letterBg = 'background: rgba(255,255,255,0.1); color: var(--text-primary);';
+                        
+                        if (optionIndex === question.correctAnswer) {
+                            optionClass += ' correct';
+                            letterBg = 'background: #10b981; color: white;';
+                        }
+                        
+                        if (optionIndex === userAnswer) {
+                            optionClass += ' selected';
+                            if (optionIndex !== question.correctAnswer) {
+                                letterBg = 'background: #ef4444; color: white;';
+                            }
+                        }
+                        
+                        reviewHTML += `
+                            <div class="${optionClass}">
+                                <div class="option-letter" style="${letterBg}">
+                                    ${String.fromCharCode(65 + optionIndex)}
+                                </div>
+                                <div>${option}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    reviewHTML += `
+                            </div>
+                    `;
+                    
+                    // Add explanation if available
+                    if (question.explanation) {
+                        reviewHTML += `
+                            <div class="review-explanation">
+                                <strong>Explanation:</strong> ${question.explanation}
+                            </div>
+                        `;
+                    }
+                    
+                    reviewHTML += `</div>`;
+                });
+                
+                reviewContainer.innerHTML = reviewHTML;
+                
+            } catch (error) {
+                console.error('Error loading question review:', error);
+                reviewContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Failed to load questions. Please try again.</p>';
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', function() {
+            initializeResults();
+            
+            // Check if user is logged in
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

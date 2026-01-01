@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - Learn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <link rel="stylesheet" href="/css/course-learning.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body class="learning-page">
+    <!-- Navigation -->
+    <nav class="learning-nav">
+        <div class="nav-container">
+            <a href="courses.html" class="nav-back">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Courses</span>
+            </a>
+            
+            <div class="course-progress">
+                <div class="course-title" id="courseTitle">Loading...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="completedLessons">0</span>/<span id="totalLessons">0</span> lessons
+                    • <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="learning-main">
+        <!-- Left Sidebar - Lessons -->
+        <aside class="lesson-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-list-ol"></i> Course Lessons</h3>
+            </div>
+            
+            <div class="lesson-list" id="lessonList">
+                <!-- Lessons loaded dynamically -->
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-outline" onclick="takeQuiz()">
+                    <i class="fas fa-question-circle"></i>
+                    Take Quiz
+                </button>
+                <button class="btn btn-primary" onclick="viewCertificate()">
+                    <i class="fas fa-award"></i>
+                    Certificate
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Video Player Section -->
+            <section class="video-section">
+                <div class="video-container" id="videoContainer">
+                    <div class="video-placeholder" id="videoPlaceholder">
+                        <div class="placeholder-content">
+                            <i class="fas fa-play-circle"></i>
+                            <h3>Select a Lesson</h3>
+                            <p>Choose a lesson from the sidebar to start learning</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-info">
+                    <h1 class="lesson-title" id="lessonTitle">Select a Lesson</h1>
+                    <div class="lesson-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="lessonDuration">--:--</span>
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="lessonStatus">Not Started</span>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lesson Content (Udacity-style notes below video) -->
+            <section class="lesson-content">
+                <div class="content-header">
+                    <h2><i class="fas fa-file-alt"></i> Lesson Content</h2>
+                    <div class="content-actions">
+                        <button class="btn btn-secondary" id="prevBtn">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button class="btn btn-primary" id="completeBtn">
+                            <i class="fas fa-check-circle"></i> Mark Complete
+                        </button>
+                        <button class="btn btn-secondary" id="nextBtn">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-body" id="lessonContent">
+                    <!-- Lesson content loaded dynamically -->
+                    <div class="empty-content">
+                        <i class="fas fa-book-open"></i>
+                        <p>Select a lesson to view its content</p>
+                    </div>
+                </div>
+                
+                <!-- Resources Section -->
+                <div class="resources-section">
+                    <h3><i class="fas fa-book"></i> Learning Resources</h3>
+                    <div class="resources-grid" id="lessonResources">
+                        <!-- Resources loaded dynamically -->
+                        <div class="empty-resources">
+                            <p>No resources for this lesson</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Locked Lesson Modal -->
+    <div class="modal-overlay" id="lockedModal">
+        <div class="modal-container modal-sm">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-lock"></i>
+                    Lesson Locked
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h4>Complete Previous Lesson</h4>
+                <p>You need to finish the previous lesson before unlocking this one.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal()">
+                    <i class="fas fa-check"></i>
+                    Got it
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/javascript/utils.js"></script>
+    <script src="/javascript/course-learning.js"></script>
+    
+    <script>
+        // Check login
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'index.html';
+        }
+        
+        // Navigation functions
+        function takeQuiz() {
+            const courseId = getCourseId();
+            window.location.href = `quiz.html?course=${courseId}`;
+        }
+        
+        function viewCertificate() {
+            const courseId = getCourseId();
+            window.location.href = `certificate.html?course=${courseId}`;
+        }
+        
+        function closeModal() {
+            document.getElementById('lockedModal').classList.remove('active');
+        }
+        
+        function getCourseId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('course') || '1';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeniusGuide - Leaderboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/quiz.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    
+    <style>
+        .leaderboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .leaderboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--water-blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .leaderboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .leaderboard-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .leaderboard-tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .leaderboard-tab:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--water-blue);
+        }
+        
+        .leaderboard-tab.active {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2));
+            color: var(--water-blue);
+            border: 1px solid var(--water-blue);
+        }
+        
+        .leaderboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .leaderboard-main {
+            background: var(--dark-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .leaderboard-table th {
+            text-align: left;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .leaderboard-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+        
+        .leaderboard-table tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .leaderboard-table tr.current-user td {
+            background: rgba(56, 189, 248, 0.1);
+        }
+        
+        .rank-cell {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .rank-1 .rank-cell {
+            color: #f59e0b;
+        }
+        
+        .rank-2 .rank-cell {
+            color: #94a3b8;
+        }
+        
+        .rank-3 .rank-cell {
+            color: #92400e;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--water-blue);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .user-level {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .score-cell {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--water-blue);
+        }
+        
+        .xp-cell {
+            font-weight: 600;
+        }
+        
+        .badges-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .badge-icon {
+            font-size: 1.16rem;
+            color: var(--water-blue);
+        }
+        
+        .leaderboard-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .current-user-stats {
+            background: var(--dark-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stats-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--water-blue);
+            object-fit: cover;
+        }
+        
+        .stats-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--water-blue);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .achievement-highlights {
+            background: var(--dark-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .achievement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+        }
+        
+        .achievement-icon {
+            font-size: 1.5rem;
+            color: var(--water-blue);
+        }
+        
+        .achievement-info {
+            flex: 1;
+        }
+        
+        .achievement-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .achievement-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .page-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--water-blue);
+        }
+        
+        .page-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--water-blue);
+            border-color: var(--water-blue);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        @media (min-width: 900px) {
+            .leaderboard-content {
+                grid-template-columns: 1fr 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 1rem;
+            }
+            
+            .badges-cell {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .xp-cell {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="quiz-body">
+    <!-- Header -->
+    <header class="quiz-header">
+        <div class="quiz-nav">
+            <div class="nav-left">
+                <i class="fa-solid fa-brain logo-icon"></i>
+                <span class="logo-text">GeniusGuide</span>
+                <span class="page-title">Leaderboard</span>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-menu">
+                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff" 
+                         alt="Avatar" 
+                         class="user-avatar-small">
+                    <span>John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <a href="quiz.html" class="btn-outline">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="leaderboard-container">
+        <!-- Leaderboard Header -->
+        <div class="leaderboard-header">
+            <h1 class="leaderboard-title">Global Leaderboard</h1>
+            <p class="leaderboard-subtitle">
+                Compete with learners worldwide and climb to the top!
+            </p>
+            
+            <div class="leaderboard-tabs">
+                <button class="leaderboard-tab active" data-period="all">
+                    All Time
+                </button>
+                <button class="leaderboard-tab" data-period="monthly">
+                    This Month
+                </button>
+                <button class="leaderboard-tab" data-period="weekly">
+                    This Week
+                </button>
+                <button class="leaderboard-tab" data-period="daily">
+                    Today
+                </button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Content -->
+        <div class="leaderboard-content">
+            <!-- Main Leaderboard -->
+            <div class="leaderboard-main">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Rank</th>
+                            <th>User</th>
+                            <th style="width: 120px;">Score</th>
+                            <th style="width: 120px;">XP</th>
+                            <th style="width: 100px;">Badges</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Leaderboard data will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="page-btn" id="prevPageBtn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="page-info">
+                        Page <span id="currentPage">1</span> of 
+                        <span id="totalPages">5</span>
+                    </div>
+                    
+                    <button class="page-btn" id="nextPageBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="leaderboard-sidebar">
+                <!-- Current User Stats -->
+                <div class="current-user-stats">
+                    <div class="stats-header">
+                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff&size=120" 
+                             alt="Your Avatar" 
+                             class="stats-avatar">
+                        <div>
+                            <div class="stats-title">Your Stats</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                                Global Rank: <span id="userRank" style="font-weight: 600; color: var(--water-blue);">#8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div id="userScore" class="stat-value">85%</div>
+                            <div class="stat-label">Avg. Score</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div id="userXP" class="stat-value">1,250</div>
+                            <div class="stat-label">XP Points</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div id="userQuizzes" class="stat-value">15</div>
+                            <div class="stat-label">Quizzes</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <div id="userStreak" class="stat-value">7</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievement Highlights -->
+                <div class="achievement-highlights">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">
+                        <i class="fas fa-trophy"></i>
+                        Recent Achievements
+                    </h3>
+                    
+                    <div class="achievement-list">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">Fast Learner</div>
+                                <div class="achievement-description">
+                                    Scored 95% on Web Development quiz
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">Consistent</div>
+                                <div class="achievement-description">
+                                    7-day quiz streak achieved
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">Top 10</div>
+                                <div class="achievement-description">
+                                    Reached top 10 on global leaderboard
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/javascript/utils.js"></script>
+    <script src="/javascript//quiz_api.js"></script>
+    <script>
+        // Mock leaderboard data
+        const leaderboardData = {
+            all: [
+                { rank: 1, name: "Alex Johnson", avatar: "AJ", score: 98, xp: 5420, level: "Master", badges: 12 },
+                { rank: 2, name: "Sarah Miller", avatar: "SM", score: 97, xp: 4980, level: "Master", badges: 11 },
+                { rank: 3, name: "David Chen", avatar: "DC", score: 96, xp: 4760, level: "Expert", badges: 10 },
+                { rank: 4, name: "Emma Wilson", avatar: "EW", score: 95, xp: 4520, level: "Expert", badges: 9 },
+                { rank: 5, name: "Michael Brown", avatar: "MB", score: 94, xp: 4320, level: "Expert", badges: 8 },
+                { rank: 6, name: "Lisa Taylor", avatar: "LT", score: 92, xp: 3980, level: "Advanced", badges: 7 },
+                { rank: 7, name: "Robert Lee", avatar: "RL", score: 90, xp: 3780, level: "Advanced", badges: 6 },
+                { rank: 8, name: "John Doe", avatar: "JD", score: 88, xp: 1250, level: "Intermediate", badges: 5 },
+                { rank: 9, name: "Maria Garcia", avatar: "MG", score: 87, xp: 3250, level: "Intermediate", badges: 5 },
+                { rank: 10, name: "James Wilson", avatar: "JW", score: 85, xp: 3120, level: "Intermediate", badges: 4 },
+                { rank: 11, name: "Jennifer Davis", avatar: "JD", score: 84, xp: 2980, level: "Intermediate", badges: 4 },
+                { rank: 12, name: "Thomas Moore", avatar: "TM", score: 82, xp: 2850, level: "Beginner", badges: 3 },
+                { rank: 13, name: "Patricia Harris", avatar: "PH", score: 80, xp: 2720, level: "Beginner", badges: 3 },
+                { rank: 14, name: "Christopher Clark", avatar: "CC", score: 78, xp: 2580, level: "Beginner", badges: 2 },
+                { rank: 15, name: "Linda Lewis", avatar: "LL", score: 75, xp: 2450, level: "Beginner", badges: 2 }
+            ],
+            monthly: [
+                { rank: 1, name: "John Doe", avatar: "JD", score: 95, xp: 1250, level: "Intermediate", badges: 5 },
+                { rank: 2, name: "Sarah Miller", avatar: "SM", score: 92, xp: 980, level: "Master", badges: 11 },
+                { rank: 3, name: "Alex Johnson", avatar: "AJ", score: 90, xp: 920, level: "Master", badges: 12 },
+                { rank: 4, name: "Emma Wilson", avatar: "EW", score: 88, xp: 850, level: "Expert", badges: 9 },
+                { rank: 5, name: "David Chen", avatar: "DC", score: 85, xp: 820, level: "Expert", badges: 10 }
+            ],
+            weekly: [
+                { rank: 1, name: "John Doe", avatar: "JD", score: 98, xp: 450, level: "Intermediate", badges: 5 },
+                { rank: 2, name: "Alex Johnson", avatar: "AJ", score: 95, xp: 420, level: "Master", badges: 12 },
+                { rank: 3, name: "Emma Wilson", avatar: "EW", score: 92, xp: 380, level: "Expert", badges: 9 },
+                { rank: 4, name: "Sarah Miller", avatar: "SM", score: 90, xp: 350, level: "Master", badges: 11 },
+                { rank: 5, name: "David Chen", avatar: "DC", score: 88, xp: 320, level: "Expert", badges: 10 }
+            ],
+            daily: [
+                { rank: 1, name: "John Doe", avatar: "JD", score: 100, xp: 150, level: "Intermediate", badges: 5 },
+                { rank: 2, name: "Emma Wilson", avatar: "EW", score: 95, xp: 120, level: "Expert", badges: 9 },
+                { rank: 3, name: "Alex Johnson", avatar: "AJ", score: 92, xp: 110, level: "Master", badges: 12 },
+                { rank: 4, name: "Sarah Miller", avatar: "SM", score: 90, xp: 100, level: "Master", badges: 11 },
+                { rank: 5, name: "David Chen", avatar: "DC", score: 88, xp: 90, level: "Expert", badges: 10 }
+            ]
+        };
+        
+        // State
+        let currentPeriod = 'all';
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        
+        // DOM Elements
+        const leaderboardTabs = document.querySelectorAll('.leaderboard-tab');
+        const leaderboardBody = document.getElementById('leaderboardBody');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const currentPageSpan = document.getElementById('currentPage');
+        const totalPagesSpan = document.getElementById('totalPages');
+        const userRankSpan = document.getElementById('userRank');
+        const userScoreSpan = document.getElementById('userScore');
+        const userXPSpan = document.getElementById('userXP');
+        const userQuizzesSpan = document.getElementById('userQuizzes');
+        const userStreakSpan = document.getElementById('userStreak');
+        
+        // Initialize
+        function initializeLeaderboard() {
+            // Load user stats
+            loadUserStats();
+            
+            // Load leaderboard data
+            updateLeaderboard();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+        
+        // Load user stats
+        function loadUserStats() {
+            // For demo, use static data
+            const userData = {
+                rank: 8,
+                score: 85,
+                xp: 1250,
+                quizzes: 15,
+                streak: 7
+            };
+            
+            userRankSpan.textContent = `#${userData.rank}`;
+            userScoreSpan.textContent = `${userData.score}%`;
+            userXPSpan.textContent = userData.xp.toLocaleString();
+            userQuizzesSpan.textContent = userData.quizzes;
+            userStreakSpan.textContent = userData.streak;
+        }
+        
+        // Update leaderboard
+        function updateLeaderboard() {
+            const data = leaderboardData[currentPeriod];
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = data.slice(startIndex, endIndex);
+            
+            // Update pagination
+            currentPageSpan.textContent = currentPage;
+            totalPagesSpan.textContent = totalPages;
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+            
+            // Generate leaderboard HTML
+            let leaderboardHTML = '';
+            
+            pageData.forEach(user => {
+                const isCurrentUser = user.name === "John Doe";
+                const rowClass = isCurrentUser ? 'current-user' : '';
+                const rankClass = `rank-${user.rank <= 3 ? user.rank : 'other'}`;
+                
+                leaderboardHTML += `
+                    <tr class="${rowClass} ${rankClass}">
+                        <td class="rank-cell">#${user.rank}</td>
+                        <td>
+                            <div class="user-cell">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.avatar)}&background=38bdf8&color=fff&size=48" 
+                                     alt="${user.name}" 
+                                     class="user-avatar">
+                                <div class="user-info">
+                                    <div class="user-name">${user.name}</div>
+                                    <div class="user-level">${user.level}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="score-cell">${user.score}%</td>
+                        <td class="xp-cell">${user.xp.toLocaleString()}</td>
+                        <td class="badges-cell">
+                            ${Array(user.badges).fill('<i class="fas fa-award badge-icon"></i>').join('')}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            leaderboardBody.innerHTML = leaderboardHTML;
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab switching
+            leaderboardTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    leaderboardTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update period and reset page
+                    currentPeriod = this.dataset.period;
+                    currentPage = 1;
+                    
+                    // Update leaderboard
+                    updateLeaderboard();
+                });
+            });
+            
+            // Pagination
+            prevPageBtn.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updateLeaderboard();
+                }
+            });
+            
+            nextPageBtn.addEventListener('click', function() {
+                const data = leaderboardData[currentPeriod];
+                const totalPages = Math.ceil(data.length / itemsPerPage);
+                
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updateLeaderboard();
+                }
+            });
+        }
+        
+        // Check if user is logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('load', initializeLeaderboard);
+    </script>
+</body>
+</html>
