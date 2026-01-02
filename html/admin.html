@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Courses - Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .course-code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: bold;
+            color: var(--water-blue);
+        }
+        
+        .department-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .department-badge.cs {
+            background: rgba(99, 102, 241, 0.1);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .department-badge.it {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        
+        .department-badge.is {
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .department-badge.se {
+            background: rgba(236, 72, 153, 0.1);
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.2);
+        }
+        
+        .stats-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        
+        .year-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="quiz-body">
+    <div class="profile-container admin-container">
+        <header class="quiz-header admin-header">
+            <h1 class="admin-title">Manage Courses</h1>
+            <p class="admin-subtitle">Browse and manage all available courses</p>
+        </header>
+
+        <div class="admin-toolbar">
+            <a class="btn btn-primary" href="add_course_new.html">
+                <i>📚</i> Add New Course
+            </a>
+            <a class="btn btn-outline" href="manage_users.html">
+                <i>👥</i> Manage Users
+            </a>
+            <a class="btn btn-outline" href="#course-list">
+                <i>🗂️</i> View Courses
+            </a>
+        </div>
+
+        <div class="filter-bar">
+            <form method="get" action="" class="filter-form">
+                <div class="form-row">
+                    <label for="q">Search Courses</label>
+                    <input id="q" name="q" class="admin-input" type="text" placeholder="Search by code, name, or description...">
+                </div>
+                
+                <div class="form-row">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" class="admin-select">
+                        <option value="">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Information System">Information System</option>
+                        <option value="Software Engineering">Software Engineering</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <button class="btn btn-secondary" type="submit">
+                        <i>🔍</i> Search
+                    </button>
+                    <a class="btn btn-outline" href="manage_courses.html">
+                        <i>↺</i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div id="course-list">
+            <!-- Sample course data - in a real app this would be dynamically loaded -->
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Department</th>
+                            <th>Year</th>
+                            <th>Modules</th>
+                            <th>Duration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courses-table-body">
+                        <!-- Courses will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 20px; color: var(--text-muted); font-size: 14px; text-align: center;" id="course-count">
+                Showing 0 courses
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <a class="fab" href="add_course_new.html" title="Add New Course">
+        <i>➕</i>
+    </a>
+
+    <script>
+    // Sample course data - replace with API call in real application
+    const sampleCourses = [
+        {
+            id: 1,
+            course_code: "CS101",
+            course_name: "Introduction to Programming",
+            department: "Computer Science",
+            year: 1,
+            total_modules: 12,
+            duration_hours: 40,
+            description: "Basic programming concepts using Python",
+            thumbnail: "https://example.com/cs101.jpg",
+            instructor: "Dr. Smith"
+        },
+        {
+            id: 2,
+            course_code: "IT201",
+            course_name: "Database Systems",
+            department: "Information Technology",
+            year: 2,
+            total_modules: 10,
+            duration_hours: 36,
+            description: "Introduction to database design and SQL",
+            thumbnail: "https://example.com/it201.jpg",
+            instructor: "Prof. Johnson"
+        },
+        {
+            id: 3,
+            course_code: "IS301",
+            course_name: "System Analysis",
+            department: "Information System",
+            year: 3,
+            total_modules: 8,
+            duration_hours: 32,
+            description: "Analysis and design of information systems",
+            thumbnail: "https://example.com/is301.jpg",
+            instructor: "Dr. Williams"
+        },
+        {
+            id: 4,
+            course_code: "SE401",
+            course_name: "Software Engineering",
+            department: "Software Engineering",
+            year: 4,
+            total_modules: 14,
+            duration_hours: 48,
+            description: "Software development lifecycle and methodologies",
+            thumbnail: "https://example.com/se401.jpg",
+            instructor: "Prof. Brown"
+        }
+    ];
+
+    // Function to get department abbreviation
+    function getDepartmentAbbr(department) {
+        const abbreviations = {
+            'Computer Science': 'CS',
+            'Information Technology': 'IT',
+            'Information System': 'IS',
+            'Software Engineering': 'SE'
+        };
+        return abbreviations[department] || department;
+    }
+
+    // Function to get department CSS class
+    function getDepartmentClass(department) {
+        const classes = {
+            'Computer Science': 'cs',
+            'Information Technology': 'it',
+            'Information System': 'is',
+            'Software Engineering': 'se'
+        };
+        return classes[department] || 'cs';
+    }
+
+    // Function to render courses
+    function renderCourses(courses) {
+        const tbody = document.getElementById('courses-table-body');
+        const countElement = document.getElementById('course-count');
+        
+        tbody.innerHTML = '';
+        
+        if (courses.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px;">
+                        <div class="empty-state">
+                            <i>📚</i>
+                            <h3>No courses found</h3>
+                            <p>Try a different search term or create a new course.</p>
+                            <a class="btn btn-primary" href="add_course_new.html" style="margin-top: 15px;">
+                                <i>➕</i> Create Your First Course
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            courses.forEach(course => {
+                const deptClass = getDepartmentClass(course.department);
+                const deptAbbr = getDepartmentAbbr(course.department);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <span class="course-code">${course.course_code}</span>
+                    </td>
+                    <td>
+                        <strong>${course.course_name}</strong>
+                        <div style="font-size: 12px; color: var(--text-muted);">ID: ${course.id}</div>
+                    </td>
+                    <td>
+                        <span class="department-badge ${deptClass}">
+                            ${deptAbbr}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="year-badge">Year ${course.year}</span>
+                    </td>
+                    <td>
+                        <span class="stats-badge">
+                            <i>📦</i> ${course.total_modules} modules
+                        </span>
+                    </td>
+                    <td>
+                        <span class="stats-badge">
+                            <i>⏱️</i> ${course.duration_hours}h
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a class="btn btn-sm btn-success" href="add_course_new.html?edit_id=${course.id}">
+                                <i>✏️</i> Edit
+                            </a>
+                            <button class="btn btn-sm btn-danger" type="button" onclick="deleteCourse(${course.id}, '${course.course_code.replace(/'/g, "\\'")}')">
+                                <i>🗑️</i> Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        countElement.textContent = `Showing ${courses.length} course${courses.length !== 1 ? 's' : ''}`;
+    }
+
+    // Initialize with sample data
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCourses(sampleCourses);
+        
+        // Add filter functionality
+        const searchInput = document.getElementById('q');
+        const departmentSelect = document.getElementById('department');
+        const filterForm = document.querySelector('.filter-form');
+        
+        filterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            filterCourses();
+        });
+        
+        // Add change event for department select
+        departmentSelect.addEventListener('change', filterCourses);
+        
+        // Add input event for search (with debounce)
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterCourses, 300);
+        });
+    });
+
+    // Function to filter courses
+    function filterCourses() {
+        const searchTerm = document.getElementById('q').value.toLowerCase();
+        const departmentFilter = document.getElementById('department').value;
+        
+        const filtered = sampleCourses.filter(course => {
+            const matchesSearch = !searchTerm || 
+                course.course_code.toLowerCase().includes(searchTerm) ||
+                course.course_name.toLowerCase().includes(searchTerm) ||
+                course.description.toLowerCase().includes(searchTerm);
+            
+            const matchesDepartment = !departmentFilter || course.department === departmentFilter;
+            
+            return matchesSearch && matchesDepartment;
+        });
+        
+        renderCourses(filtered);
+    }
+
+    // Delete course function
+    function deleteCourse(courseId, courseCode) {
+        if (confirm(`Are you sure you want to delete ${courseCode}? This action cannot be undone.`)) {
+            // In a real application, you would make an API call here
+            console.log(`Deleting course ${courseId}: ${courseCode}`);
+            alert(`Course ${courseCode} would be deleted (simulated). In a real app, this would call an API.`);
+            
+            // For demo: remove from array and re-render
+            const index = sampleCourses.findIndex(c => c.id === courseId);
+            if (index !== -1) {
+                sampleCourses.splice(index, 1);
+                filterCourses(); // Re-apply filters
+            }
+        }
+    }
+    </script>
+</body>
+</html>
