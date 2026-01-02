@@ -1,3 +1,63 @@
+<?php
+// take-quiz.php
+require_once 'config/session.php';
+require_once 'config/database.php';
+
+Auth::requireLogin();
+$user = Auth::getUser();
+
+$quizId = $_GET['id'] ?? 0;
+
+$database = new Database();
+$db = $database->getConnection();
+
+if ($quizId == 'random') {
+    // Get a random quiz
+    $query = "SELECT id FROM quizzes ORDER BY RAND() LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $randomQuiz = $stmt->fetch(PDO::FETCH_ASSOC);
+    $quizId = $randomQuiz['id'] ?? 1;
+}
+
+// Get quiz details
+$query = "SELECT * FROM quizzes WHERE id = :quiz_id";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':quiz_id', $quizId);
+$stmt->execute();
+$quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$quiz) {
+    die('Quiz not found!');
+}
+
+// Get questions for this quiz
+$query = "SELECT q.*, 
+                 GROUP_CONCAT(o.option_text ORDER BY o.option_index SEPARATOR '|||') as options_text
+          FROM questions q
+          LEFT JOIN question_options o ON q.id = o.question_id
+          WHERE q.quiz_id = :quiz_id
+          GROUP BY q.id
+          ORDER BY q.id";
+          
+$stmt = $db->prepare($query);
+$stmt->bindParam(':quiz_id', $quizId);
+$stmt->execute();
+$questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Format questions for JavaScript
+$formattedQuestions = [];
+foreach ($questions as $question) {
+    $options = explode('|||', $question['options_text']);
+    $formattedQuestions[] = [
+        'id' => $question['id'],
+        'question' => $question['question_text'],
+        'points' => $question['points'],
+        'correct_option_index' => $question['correct_option_index'],
+        'options' => $options
+    ];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,9 +76,6 @@
     <link rel="stylesheet" href="/css/quiz.css">
     <link rel="stylesheet" href="/css/quiz_taking.css">
     <link rel="stylesheet" href="/css/modal.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
     
     <style>
         .quiz-instructions {
@@ -44,12 +101,54 @@
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
-            text-decoration: none;
         }
         
         .start-quiz-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .option-item.selected {
+            border-color: var(--water-blue);
+            background: rgba(56, 189, 248, 0.1);
+        }
+        
+        .option-item.selected .option-check {
+            display: block;
+            color: var(--water-blue);
+        }
+        
+        .question-indicator {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background: var(--dark-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .question-indicator.current {
+            border-color: var(--water-blue);
+            background: var(--water-blue);
+            color: white;
+        }
+        
+        .question-indicator.answered {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        
+        .question-indicator.marked {
+            border-color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .timer-warning {
+            color: var(--warning) !important;
         }
     </style>
 </head>
@@ -65,13 +164,12 @@
             
             <div class="nav-right">
                 <div class="user-menu">
-                    <img src="https://ui-avatars.com/api/?name=John+Doe&background=38bdf8&color=fff" 
+                    <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>" 
                          alt="Avatar" 
                          class="user-avatar-small">
-                    <span>John Doe</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <span><?php echo htmlspecialchars($user['full_name']); ?></span>
                 </div>
-                <a href="quiz.html" class="btn-outline">
+                <a href="quiz.php" class="btn-outline">
                     <i class="fas fa-arrow-left"></i>
                     Back to Dashboard
                 </a>
@@ -82,30 +180,38 @@
     <main class="quiz-taking-container">
         <!-- Quiz Info (Initial State) -->
         <div id="quizInfo" class="quiz-instructions">
-            <h2 id="quizTitle">Data Structures Fundamentals</h2>
+            <h2 id="quizTitle"><?php echo htmlspecialchars($quiz['title']); ?></h2>
             <p id="quizDescription" style="color: var(--text-secondary); margin: 1rem 0;">
-                Test your knowledge on arrays, linked lists, stacks, queues, trees, and graphs.
+                <?php echo htmlspecialchars($quiz['description']); ?>
             </p>
             
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0;">
                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: var(--radius-md);">
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">Questions</div>
-                    <div id="quizQuestions" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">20</div>
+                    <div id="quizQuestions" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">
+                        <?php echo $quiz['total_questions']; ?>
+                    </div>
                 </div>
                 
                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: var(--radius-md);">
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">Time</div>
-                    <div id="quizTime" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">30 min</div>
+                    <div id="quizTime" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">
+                        <?php echo $quiz['time_limit_minutes']; ?> min
+                    </div>
                 </div>
                 
                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: var(--radius-md);">
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">Difficulty</div>
-                    <div id="quizDifficulty" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">Medium</div>
+                    <div id="quizDifficulty" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">
+                        <?php echo $quiz['difficulty']; ?>
+                    </div>
                 </div>
                 
                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: var(--radius-md);">
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">Points</div>
-                    <div id="quizPoints" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">200</div>
+                    <div id="quizPoints" style="font-size: 1.5rem; font-weight: 700; color: var(--water-blue);">
+                        <?php echo $quiz['total_points']; ?>
+                    </div>
                 </div>
             </div>
             
@@ -133,16 +239,18 @@
             <!-- Quiz Header -->
             <div class="quiz-header-bar">
                 <div class="quiz-title-section">
-                    <h2 id="currentQuizTitle">Data Structures Fundamentals</h2>
-                    <p class="quiz-subtitle" id="currentQuizSubtitle">Data Structures & Algorithms</p>
+                    <h2 id="currentQuizTitle"><?php echo htmlspecialchars($quiz['title']); ?></h2>
+                    <p class="quiz-subtitle" id="currentQuizSubtitle"><?php echo htmlspecialchars($quiz['category']); ?></p>
                 </div>
                 
                 <div class="quiz-info-section">
                     <div class="quiz-timer">
                         <div class="timer-label">Time Remaining</div>
-                        <div id="timerValue" class="timer-value">30:00</div>
+                        <div id="timerValue" class="timer-value"><?php echo sprintf('%02d:00', $quiz['time_limit_minutes']); ?></div>
                     </div>
-                    <span id="difficultyBadge" class="quiz-difficulty-badge medium">Medium</span>
+                    <span id="difficultyBadge" class="quiz-difficulty-badge <?php echo strtolower($quiz['difficulty']); ?>">
+                        <?php echo $quiz['difficulty']; ?>
+                    </span>
                 </div>
             </div>
 
@@ -151,12 +259,12 @@
                 <div class="progress-header">
                     <div class="progress-info">
                         Question <span id="currentQuestionNumber">1</span> of 
-                        <span id="totalQuestions">20</span>
+                        <span id="totalQuestions"><?php echo count($formattedQuestions); ?></span>
                     </div>
-                    <div class="progress-percentage" id="progressPercentage">5%</div>
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
                 </div>
                 <div class="progress-bar-container">
-                    <div class="progress-bar" id="progressBar" style="width: 5%"></div>
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
                 </div>
             </div>
 
@@ -164,10 +272,8 @@
             <div id="questionContainer" class="question-container">
                 <div class="question-header">
                     <span class="question-number">Question 1</span>
-                    <h3 class="question-text" id="questionText">
-                        What is the time complexity of accessing an element in an array?
-                    </h3>
-                    <span class="question-points">10 points</span>
+                    <h3 class="question-text" id="questionText"></h3>
+                    <span class="question-points" id="questionPoints">0 points</span>
                 </div>
                 
                 <div class="options-grid" id="optionsContainer">
@@ -207,7 +313,7 @@
     </main>
 
     <!-- Modal for Quiz Submission -->
-    <div id="submitModal" class="modal-overlay">
+    <div id="submitModal" class="modal-overlay" style="display: none;">
         <div class="modal-container modal-sm">
             <div class="modal-header">
                 <h3 class="modal-title">
@@ -221,7 +327,7 @@
                 <p>Are you sure you want to submit your quiz?</p>
                 <p style="color: var(--text-secondary); font-size: 0.95rem;">
                     You have answered <span id="answeredCount">0</span> out of 
-                    <span id="totalQuestionsModal">20</span> questions.
+                    <span id="totalQuestionsModal"><?php echo count($formattedQuestions); ?></span> questions.
                 </p>
                 <p style="color: var(--warning); margin-top: 1rem;">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -236,26 +342,20 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="/javascript//utils.js"></script>
-    <script src="/javascript/quiz_api.js"></script>
-    <script src="/javascript/quiz_taking.js"></script>
     <script>
-        // Get quiz ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const quizId = urlParams.get('id') || 1; // Default to quiz ID 1
+        // Quiz data from PHP
+        const quizData = <?php echo json_encode($quiz); ?>;
+        const questions = <?php echo json_encode($formattedQuestions); ?>;
         
         // Quiz state
         let quizState = {
-            quizId: parseInt(quizId),
+            quizId: <?php echo $quizId; ?>,
             currentQuestion: 0,
             answers: {},
             markedForReview: new Set(),
             startTime: null,
-            timeRemaining: 1800, // 30 minutes in seconds
-            timer: null,
-            questions: [],
-            quizData: null
+            timeRemaining: <?php echo $quiz['time_limit_minutes'] * 60; ?>,
+            timer: null
         };
         
         // DOM Elements
@@ -267,36 +367,6 @@
         const closeSubmitModal = document.getElementById('closeSubmitModal');
         const cancelSubmitBtn = document.getElementById('cancelSubmitBtn');
         const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
-        
-        // Load quiz data
-        async function loadQuizData() {
-            try {
-                const response = await API.getQuizById(quizId);
-                if (response.success) {
-                    quizState.quizData = response.data;
-                    
-                    // Update quiz info
-                    document.getElementById('quizTitle').textContent = response.data.title;
-                    document.getElementById('quizDescription').textContent = response.data.description;
-                    document.getElementById('quizQuestions').textContent = response.data.questions;
-                    document.getElementById('quizTime').textContent = `${response.data.time} min`;
-                    document.getElementById('quizDifficulty').textContent = response.data.difficulty;
-                    document.getElementById('quizPoints').textContent = response.data.questions * 10;
-                    
-                    // Set timer
-                    quizState.timeRemaining = response.data.time * 60;
-                    
-                    // Load questions
-                    const questionsResponse = await API.getQuizQuestions(quizId);
-                    if (questionsResponse.success) {
-                        quizState.questions = questionsResponse.data;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading quiz data:', error);
-                alert('Failed to load quiz. Please try again.');
-            }
-        }
         
         // Start quiz
         startQuizBtn.addEventListener('click', function() {
@@ -347,17 +417,17 @@
         
         // Load question
         function loadQuestion(index) {
-            if (index < 0 || index >= quizState.questions.length) return;
+            if (index < 0 || index >= questions.length) return;
             
             quizState.currentQuestion = index;
-            const question = quizState.questions[index];
+            const question = questions[index];
             
             // Update question number
             document.getElementById('currentQuestionNumber').textContent = index + 1;
-            document.getElementById('totalQuestions').textContent = quizState.questions.length;
+            document.getElementById('totalQuestions').textContent = questions.length;
             
             // Update progress
-            const progress = ((index + 1) / quizState.questions.length) * 100;
+            const progress = ((index + 1) / questions.length) * 100;
             document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
             document.getElementById('progressBar').style.width = `${progress}%`;
             
@@ -365,7 +435,7 @@
             document.getElementById('questionText').textContent = question.question;
             
             // Update points
-            document.querySelector('.question-points').textContent = `${question.points} points`;
+            document.getElementById('questionPoints').textContent = `${question.points} points`;
             
             // Update options
             const optionsContainer = document.getElementById('optionsContainer');
@@ -390,7 +460,7 @@
             
             // Update navigation buttons
             document.getElementById('prevBtn').disabled = index === 0;
-            document.getElementById('nextBtn').textContent = index === quizState.questions.length - 1 ? 'Finish' : 'Next Question';
+            document.getElementById('nextBtn').textContent = index === questions.length - 1 ? 'Finish' : 'Next Question';
             
             // Update mark for review button
             const markReviewBtn = document.getElementById('markReviewBtn');
@@ -430,13 +500,14 @@
             const container = document.getElementById('questionIndicators');
             container.innerHTML = '';
             
-            for (let i = 0; i < quizState.questions.length; i++) {
+            for (let i = 0; i < questions.length; i++) {
                 const indicator = document.createElement('div');
-                indicator.className = 'question-indicator unanswered';
+                indicator.className = 'question-indicator';
                 indicator.textContent = i + 1;
                 indicator.addEventListener('click', () => loadQuestion(i));
                 container.appendChild(indicator);
             }
+            updateQuestionIndicators();
         }
         
         // Update question indicators
@@ -485,7 +556,7 @@
         });
         
         document.getElementById('nextBtn').addEventListener('click', function() {
-            if (quizState.currentQuestion < quizState.questions.length - 1) {
+            if (quizState.currentQuestion < questions.length - 1) {
                 loadQuestion(quizState.currentQuestion + 1);
             } else {
                 // Show submit modal if on last question
@@ -500,18 +571,18 @@
             // Calculate answered questions
             const answeredCount = Object.keys(quizState.answers).length;
             document.getElementById('answeredCount').textContent = answeredCount;
-            document.getElementById('totalQuestionsModal').textContent = quizState.questions.length;
+            document.getElementById('totalQuestionsModal').textContent = questions.length;
             
-            submitModal.classList.add('active');
+            submitModal.style.display = 'flex';
         }
         
         // Modal controls
         closeSubmitModal.addEventListener('click', () => {
-            submitModal.classList.remove('active');
+            submitModal.style.display = 'none';
         });
         
         cancelSubmitBtn.addEventListener('click', () => {
-            submitModal.classList.remove('active');
+            submitModal.style.display = 'none';
         });
         
         confirmSubmitBtn.addEventListener('click', submitQuiz);
@@ -519,6 +590,9 @@
         async function submitQuiz() {
             // Stop timer
             clearInterval(quizState.timer);
+            
+            // Calculate time taken
+            const timeTaken = Math.floor((new Date() - quizState.startTime) / 1000);
             
             // Show loading state
             document.body.innerHTML = `
@@ -540,26 +614,38 @@
             `;
             
             try {
-                // Submit quiz to API
-                const response = await API.submitQuiz(quizId, quizState.answers);
+                // Submit quiz using Fetch API
+                const formData = new FormData();
+                formData.append('quiz_id', quizState.quizId);
+                formData.append('answers', JSON.stringify(quizState.answers));
+                formData.append('time_taken', timeTaken);
+                formData.append('marked_review', JSON.stringify([...quizState.markedForReview]));
                 
-                if (response.success) {
-                    // Store results
-                    localStorage.setItem('quizResults', JSON.stringify(response.data));
-                    
+                const response = await fetch('api/submit_quiz.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
                     // Redirect to results page
-                    window.location.href = `results.html?quizId=${quizId}`;
+                    window.location.href = `results.php?attempt_id=${result.attempt_id}`;
+                } else {
+                    throw new Error(result.message);
                 }
             } catch (error) {
                 console.error('Error submitting quiz:', error);
                 alert('Failed to submit quiz. Please try again.');
-                window.location.href = 'quiz.html';
+                window.location.href = 'quiz.php';
             }
         }
         
-        // Initialize
-        window.addEventListener('load', function() {
-            loadQuizData();
+        // Close modal on outside click
+        window.addEventListener('click', function(event) {
+            if (event.target == submitModal) {
+                submitModal.style.display = 'none';
+            }
         });
     </script>
 </body>
