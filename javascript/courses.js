@@ -7,6 +7,7 @@ const courseData = [
         title: "HTML Fundamentals",
         description: "Learn the building blocks of web development with HTML. Create structured web pages using semantic elements, forms, and multimedia.",
         category: "programming",
+        department: "Software Eng",
         level: "beginner",
         duration: "4 hours",
         lessons: 12,
@@ -16,12 +17,14 @@ const courseData = [
         icon: "fab fa-html5",
         iconColor: "#E34F26",
         bgColor: "rgba(227, 79, 38, 0.1)"
+        ,sampleVideoId: "qz0aGYrrlhU"
     },
     {
         id: 2,
         title: "CSS Styling Mastery",
         description: "Master CSS to create beautiful and responsive web designs. Learn flexbox, grid, animations, and modern CSS techniques.",
         category: "programming",
+        department: "Software Eng",
         level: "beginner",
         duration: "6 hours",
         lessons: 18,
@@ -31,12 +34,14 @@ const courseData = [
         icon: "fab fa-css3-alt",
         iconColor: "#1572B6",
         bgColor: "rgba(21, 114, 182, 0.1)"
+        ,sampleVideoId: "MDuagwOuCxw"
     },
     {
         id: 3,
         title: "JavaScript Essentials",
         description: "Learn JavaScript from basics to advanced concepts. Master DOM manipulation, events, async programming, and modern ES6+ features.",
         category: "programming",
+        department: "CS",
         level: "intermediate",
         duration: "8 hours",
         lessons: 24,
@@ -46,12 +51,14 @@ const courseData = [
         icon: "fab fa-js",
         iconColor: "#F7DF1E",
         bgColor: "rgba(247, 223, 30, 0.1)"
+        ,sampleVideoId: "upDLs1sn7g4"
     },
     {
         id: 4,
         title: "Python Programming",
         description: "Start your journey with Python. Learn syntax, data structures, OOP, and build real-world applications with this versatile language.",
         category: "programming",
+        department: "IT",
         level: "beginner",
         duration: "10 hours",
         lessons: 30,
@@ -61,6 +68,7 @@ const courseData = [
         icon: "fab fa-python",
         iconColor: "#3776AB",
         bgColor: "rgba(55, 118, 171, 0.1)"
+        ,sampleVideoId: "rfscVS0vtbw"
     },
     {
         id: 5,
@@ -218,6 +226,9 @@ const continueCourses = [
     }
 ];
 
+// Departments to display
+const allowedDepartments = ['Software Eng', 'CS', 'IT', 'IS'];
+
 // DOM Elements
 const coursesContainer = document.getElementById('coursesContainer');
 const continueContainer = document.getElementById('continueContainer');
@@ -241,10 +252,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Update progress counters
 function updateProgressCounters() {
-    const enrolled = courseData.length;
-    const completed = courseData.filter(course => course.progress === 100).length;
-    const inProgress = courseData.filter(course => course.progress > 0 && course.progress < 100).length;
-    
+    const allowedCourses = courseData.filter(c => allowedDepartments.includes(c.department));
+    const enrolled = allowedCourses.length;
+    const completed = allowedCourses.filter(course => course.progress === 100).length;
+    const inProgress = allowedCourses.filter(course => course.progress > 0 && course.progress < 100).length;
+
     document.getElementById('enrolledCourses').textContent = enrolled;
     document.getElementById('completedCourses').textContent = completed;
     document.getElementById('inProgress').textContent = inProgress;
@@ -254,10 +266,10 @@ function updateProgressCounters() {
 function renderCourses() {
     coursesContainer.innerHTML = '';
     
-    // Filter courses by category
-    let filteredCourses = courseData;
+    // Start with allowed departments only
+    let filteredCourses = courseData.filter(c => allowedDepartments.includes(c.department));
     if (currentCategory !== 'all') {
-        filteredCourses = courseData.filter(course => course.category === currentCategory);
+        filteredCourses = filteredCourses.filter(course => course.department === currentCategory);
     }
     
     // Limit displayed courses
@@ -286,14 +298,14 @@ function createCourseCard(course) {
     const card = document.createElement('div');
     card.className = 'course-card';
     card.dataset.id = course.id;
-    card.dataset.category = course.category;
+    card.dataset.department = course.department || course.category;
     
     const levelClass = `level-${course.level}`;
     
     card.innerHTML = `
         <div class="course-image" style="background: ${course.bgColor}">
             <i class="${course.icon} course-icon" style="color: ${course.iconColor}"></i>
-            <span class="course-category">${course.category}</span>
+            <span class="course-category">${course.department || course.category}</span>
         </div>
         <div class="course-content">
             <div class="course-header">
@@ -381,8 +393,14 @@ function showEmptyState() {
 // Render continue learning courses
 function renderContinueCourses() {
     continueContainer.innerHTML = '';
-    
-    continueCourses.forEach(course => {
+
+    // Only show continue courses that belong to allowed departments
+    const allowedContinue = continueCourses.filter(cc => {
+        const source = courseData.find(c => c.id === cc.id);
+        return source && allowedDepartments.includes(source.department);
+    });
+
+    allowedContinue.forEach(course => {
         const continueCard = document.createElement('div');
         continueCard.className = 'continue-card';
         
@@ -481,12 +499,14 @@ function setupEventListeners() {
             return;
         }
         
-        // Filter courses by search term
-        const filteredCourses = courseData.filter(course => 
-            course.title.toLowerCase().includes(searchTerm) ||
-            course.description.toLowerCase().includes(searchTerm) ||
-            course.category.toLowerCase().includes(searchTerm)
-        );
+        // Filter courses by search term (within allowed departments)
+        const filteredCourses = courseData
+            .filter(c => allowedDepartments.includes(c.department))
+            .filter(course => 
+                course.title.toLowerCase().includes(searchTerm) ||
+                course.description.toLowerCase().includes(searchTerm) ||
+                (course.department || course.category).toLowerCase().includes(searchTerm)
+            );
         
         // Update displayed courses
         const coursesToShow = filteredCourses.slice(0, displayedCourses);

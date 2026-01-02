@@ -523,7 +523,6 @@ $upcomingQuizzes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             });
         }
-        
         function showQuizDetails(quizId) {
             fetch(`api/get_quiz_details.php?id=${quizId}`)
                 .then(response => response.json())

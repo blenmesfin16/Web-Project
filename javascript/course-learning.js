@@ -1,7 +1,7 @@
 // ================ UDACITY-STYLE COURSE LEARNING ================
 
-// Course data structure
-const courseData = {
+// Default course data used as fallback when detailed lessons are not available
+const defaultCourseData = {
     id: 1,
     title: "HTML Fundamentals",
     description: "Learn the building blocks of web development with HTML.",
@@ -12,149 +12,20 @@ const courseData = {
             id: 1,
             title: "Introduction to HTML",
             duration: "45 min",
-            videoId: "qz0aGYrrlhU", // YouTube video ID
+            videoId: "qz0aGYrrlhU",
             completed: false,
             locked: false,
             content: `
                 <h3>What is HTML?</h3>
                 <p>HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of web content using a system of tags and attributes.</p>
-                
-                <h3>Why Learn HTML?</h3>
-                <p>HTML is the foundation of all websites. Whether you're building a simple blog or a complex web application, HTML is where it all begins.</p>
-                
-                <h3>Basic HTML Structure</h3>
-                <pre><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;My First Page&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt;Hello World!&lt;/h1&gt;
-    &lt;p&gt;This is my first HTML page.&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                
-                <h3>Key Concepts</h3>
-                <ul>
-                    <li><strong>Tags:</strong> HTML elements are defined by tags</li>
-                    <li><strong>Elements:</strong> Complete tags with content</li>
-                    <li><strong>Attributes:</strong> Additional information for elements</li>
-                    <li><strong>Nesting:</strong> Elements inside other elements</li>
-                </ul>
             `,
-            resources: [
-                {
-                    type: "pdf",
-                    title: "HTML Cheat Sheet",
-                    description: "Quick reference for all HTML tags",
-                    icon: "fas fa-file-pdf"
-                },
-                {
-                    type: "code",
-                    title: "Starter Template",
-                    description: "Basic HTML5 template to get started",
-                    icon: "fas fa-code"
-                }
-            ]
-        },
-        {
-            id: 2,
-            title: "HTML Elements & Tags",
-            duration: "1 hour",
-            videoId: "MDuagwOuCxw",
-            completed: false,
-            locked: true,
-            content: `
-                <h3>Common HTML Elements</h3>
-                <p>HTML provides a wide range of elements for different types of content:</p>
-                
-                <h4>Text Elements</h4>
-                <ul>
-                    <li><code>&lt;h1&gt; to &lt;h6&gt;</code> - Headings</li>
-                    <li><code>&lt;p&gt;</code> - Paragraphs</li>
-                    <li><code>&lt;strong&gt;</code> - Important text</li>
-                    <li><code>&lt;em&gt;</code> - Emphasized text</li>
-                </ul>
-                
-                <h4>Link and Image Elements</h4>
-                <pre><code>&lt;a href="https://example.com"&gt;Visit Example&lt;/a&gt;
-&lt;img src="image.jpg" alt="Description"&gt;</code></pre>
-                
-                <h4>List Elements</h4>
-                <pre><code>&lt;ul&gt;
-    &lt;li&gt;Item 1&lt;/li&gt;
-    &lt;li&gt;Item 2&lt;/li&gt;
-&lt;/ul&gt;</code></pre>
-                
-                <h3>Element Attributes</h3>
-                <p>Attributes provide additional information about elements:</p>
-                <pre><code>&lt;img src="photo.jpg" alt="Description" width="300" height="200"&gt;
-&lt;a href="page.html" target="_blank"&gt;Open in new tab&lt;/a&gt;</code></pre>
-            `,
-            resources: [
-                {
-                    type: "pdf",
-                    title: "Elements Reference",
-                    description: "Complete list of HTML elements",
-                    icon: "fas fa-file-pdf"
-                },
-                {
-                    type: "code",
-                    title: "Practice Exercises",
-                    description: "HTML coding exercises",
-                    icon: "fas fa-code"
-                }
-            ]
-        },
-        {
-            id: 3,
-            title: "HTML Forms",
-            duration: "1.5 hours",
-            videoId: "fNcJuPIZ2WE",
-            completed: false,
-            locked: true,
-            content: `
-                <h3>Creating Forms in HTML</h3>
-                <p>Forms allow users to interact with your website by submitting data.</p>
-                
-                <h4>Basic Form Structure</h4>
-                <pre><code>&lt;form action="/submit" method="post"&gt;
-    &lt;label for="name"&gt;Name:&lt;/label&gt;
-    &lt;input type="text" id="name" name="name"&gt;
-    
-    &lt;label for="email"&gt;Email:&lt;/label&gt;
-    &lt;input type="email" id="email" name="email"&gt;
-    
-    &lt;button type="submit"&gt;Submit&lt;/button&gt;
-&lt;/form&gt;</code></pre>
-                
-                <h4>Input Types</h4>
-                <ul>
-                    <li><code>type="text"</code> - Single-line text input</li>
-                    <li><code>type="email"</code> - Email address input</li>
-                    <li><code>type="password"</code> - Password input</li>
-                    <li><code>type="checkbox"</code> - Checkbox</li>
-                    <li><code>type="radio"</code> - Radio button</li>
-                    <li><code>type="file"</code> - File upload</li>
-                </ul>
-                
-                <h4>Form Validation</h4>
-                <p>HTML5 provides built-in form validation:</p>
-                <pre><code>&lt;input type="text" required&gt;
-&lt;input type="email" required&gt;
-&lt;input type="number" min="1" max="100"&gt;</code></pre>
-            `,
-            resources: [
-                {
-                    type: "pdf",
-                    title: "Forms Guide",
-                    description: "Complete guide to HTML forms",
-                    icon: "fas fa-file-pdf"
-                }
-            ]
+            resources: []
         }
     ]
 };
+
+// Mutable course object used by the page (will be populated from global list when available)
+let coursePageData = null;
 
 // Current state
 let currentLessonIndex = 0;
@@ -165,6 +36,7 @@ const lessonList = document.getElementById('lessonList');
 const videoContainer = document.getElementById('videoContainer');
 const videoPlaceholder = document.getElementById('videoPlaceholder');
 const lessonTitle = document.getElementById('lessonTitle');
+const courseDescriptionEl = document.getElementById('courseDescription');
 const lessonDuration = document.getElementById('lessonDuration');
 const lessonStatus = document.getElementById('lessonStatus');
 const lessonContent = document.getElementById('lessonContent');
@@ -180,6 +52,53 @@ const progressFill = document.getElementById('progressFill');
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(urlParams.get('course') || '1', 10);
+
+    // Try to load detailed course from global courses list (if included)
+    if (typeof courseData !== 'undefined' && Array.isArray(courseData)) {
+        const found = courseData.find(c => parseInt(c.id, 10) === courseId);
+        if (found) {
+            // If allowedDepartments exists, enforce whitelist
+            if (typeof allowedDepartments !== 'undefined' && Array.isArray(allowedDepartments) && found.department && !allowedDepartments.includes(found.department)) {
+                alert('This course is not available for your department.');
+                window.location.href = 'courses.html';
+                return;
+            }
+
+            // Build a minimal coursePageData structure from the summary
+            const totalLessons = found.lessons || 5;
+            const lessonsArr = [];
+            for (let i = 0; i < totalLessons; i++) {
+                lessonsArr.push({
+                    id: i + 1,
+                    title: `${found.title} - Lesson ${i + 1}`,
+                    duration: '30 min',
+                    videoId: found.sampleVideoId || '',
+                    completed: false,
+                    locked: i !== 0,
+                    content: `<p>Lesson ${i + 1} content for ${found.title}.</p>`,
+                    resources: []
+                });
+            }
+
+            coursePageData = {
+                id: found.id,
+                title: found.title,
+                description: found.description || '',
+                totalLessons: totalLessons,
+                progress: found.progress || 0,
+                lessons: lessonsArr,
+                department: found.department || null
+            };
+        }
+    }
+
+    // Fall back to default course if not found
+    if (!coursePageData) {
+        coursePageData = JSON.parse(JSON.stringify(defaultCourseData));
+    }
+
     loadUserProgress();
     initializeCourse();
     loadLesson(0); // Start with first lesson
@@ -192,17 +111,17 @@ function loadUserProgress() {
         userProgress = JSON.parse(savedProgress);
         
         // Update course data with user progress
-        if (userProgress[courseData.id]) {
-            courseData.progress = userProgress[courseData.id].progress || 0;
-            
+        if (userProgress[coursePageData.id]) {
+            coursePageData.progress = userProgress[coursePageData.id].progress || 0;
+
             // Update lesson completion status
-            courseData.lessons.forEach((lesson, index) => {
-                if (userProgress[courseData.id].lessons && userProgress[courseData.id].lessons[index]) {
-                    lesson.completed = userProgress[courseData.id].lessons[index].completed;
-                    
+            coursePageData.lessons.forEach((lesson, index) => {
+                if (userProgress[coursePageData.id].lessons && userProgress[coursePageData.id].lessons[index]) {
+                    lesson.completed = userProgress[coursePageData.id].lessons[index].completed;
+
                     // Unlock next lesson if current is completed
-                    if (lesson.completed && index < courseData.lessons.length - 1) {
-                        courseData.lessons[index + 1].locked = false;
+                    if (lesson.completed && index < coursePageData.lessons.length - 1) {
+                        coursePageData.lessons[index + 1].locked = false;
                     }
                 }
             });
@@ -212,15 +131,15 @@ function loadUserProgress() {
 
 // Save user progress to localStorage
 function saveUserProgress() {
-    if (!userProgress[courseData.id]) {
-        userProgress[courseData.id] = {
-            progress: courseData.progress,
+    if (!userProgress[coursePageData.id]) {
+        userProgress[coursePageData.id] = {
+            progress: coursePageData.progress,
             lessons: []
         };
     }
-    
-    userProgress[courseData.id].progress = courseData.progress;
-    userProgress[courseData.id].lessons = courseData.lessons.map(lesson => ({
+
+    userProgress[coursePageData.id].progress = coursePageData.progress;
+    userProgress[coursePageData.id].lessons = coursePageData.lessons.map(lesson => ({
         completed: lesson.completed
     }));
     
@@ -230,10 +149,12 @@ function saveUserProgress() {
 // Initialize course UI
 function initializeCourse() {
     // Set course title
-    courseTitle.textContent = courseData.title;
-    
+    courseTitle.textContent = coursePageData.title;
+
     // Set lesson counts
-    totalLessons.textContent = courseData.totalLessons;
+    totalLessons.textContent = coursePageData.totalLessons;
+    // Set course description
+    if (courseDescriptionEl) courseDescriptionEl.innerHTML = coursePageData.description || '';
     
     // Update progress
     updateProgress();
@@ -246,7 +167,7 @@ function initializeCourse() {
 function renderLessonList() {
     lessonList.innerHTML = '';
     
-    courseData.lessons.forEach((lesson, index) => {
+    coursePageData.lessons.forEach((lesson, index) => {
         const lessonItem = document.createElement('div');
         lessonItem.className = `lesson-item ${lesson.completed ? 'completed' : ''} 
                                ${index === currentLessonIndex ? 'active' : ''}
@@ -274,9 +195,9 @@ function renderLessonList() {
 
 // Load a specific lesson
 function loadLesson(index) {
-    if (index < 0 || index >= courseData.lessons.length) return;
-    
-    const lesson = courseData.lessons[index];
+    if (index < 0 || index >= coursePageData.lessons.length) return;
+
+    const lesson = coursePageData.lessons[index];
     
     // Check if lesson is locked
     if (lesson.locked) {
@@ -308,33 +229,55 @@ function loadLesson(index) {
 
 // Load YouTube video
 function loadVideo(videoId) {
-    // Remove placeholder
-    videoPlaceholder.style.display = 'none';
-    
     // Remove existing iframe
     const existingFrame = videoContainer.querySelector('.video-frame');
-    if (existingFrame) {
-        existingFrame.remove();
+    if (existingFrame) existingFrame.remove();
+
+    if (!videoId) {
+        // No video – show placeholder
+        videoPlaceholder.style.display = 'flex';
+        return;
     }
-    
-    // Create YouTube iframe
+
+    // Hide placeholder and create YouTube iframe
+    videoPlaceholder.style.display = 'none';
     const iframe = document.createElement('iframe');
     iframe.className = 'video-frame';
     iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`;
-    iframe.title = courseData.lessons[currentLessonIndex].title;
+    iframe.title = coursePageData.lessons[currentLessonIndex].title;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
     iframe.allowFullscreen = true;
-    
+
     videoContainer.appendChild(iframe);
 }
 
 // Update resources section
 function updateResources(resources) {
+    // If lesson has no resources, show the course description as a resource card
     if (!resources || resources.length === 0) {
+        if (typeof coursePageData !== 'undefined' && coursePageData && coursePageData.description) {
+            const descHTML = `
+                <a href="#" class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="resource-content">
+                        <div class="resource-title">Course Description</div>
+                        <div class="resource-desc">${coursePageData.description}</div>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-info-circle"></i> Description</span>
+                        </div>
+                    </div>
+                </a>
+            `;
+            lessonResources.innerHTML = descHTML;
+            return;
+        }
+
         lessonResources.innerHTML = '<div class="empty-resources"><p>No resources for this lesson</p></div>';
         return;
     }
-    
+
     let resourcesHTML = '';
     resources.forEach(resource => {
         resourcesHTML += `
@@ -353,13 +296,13 @@ function updateResources(resources) {
             </a>
         `;
     });
-    
+
     lessonResources.innerHTML = resourcesHTML;
 }
 
 // Update navigation buttons
 function updateNavigationButtons() {
-    const lesson = courseData.lessons[currentLessonIndex];
+    const lesson = coursePageData.lessons[currentLessonIndex];
     
     // Previous button
     prevBtn.disabled = currentLessonIndex === 0;
@@ -371,8 +314,8 @@ function updateNavigationButtons() {
         '<i class="fas fa-check-circle"></i> Mark Complete';
     
     // Next button
-    const hasNextLesson = currentLessonIndex < courseData.lessons.length - 1;
-    const nextLesson = hasNextLesson ? courseData.lessons[currentLessonIndex + 1] : null;
+    const hasNextLesson = currentLessonIndex < coursePageData.lessons.length - 1;
+    const nextLesson = hasNextLesson ? coursePageData.lessons[currentLessonIndex + 1] : null;
     
     if (hasNextLesson) {
         nextBtn.disabled = nextLesson.locked;
@@ -393,14 +336,14 @@ function updateLessonListActive() {
 
 // Update progress display
 function updateProgress() {
-    const completed = courseData.lessons.filter(lesson => lesson.completed).length;
-    const progress = Math.round((completed / courseData.totalLessons) * 100);
+    const completed = coursePageData.lessons.filter(lesson => lesson.completed).length;
+    const progress = Math.round((completed / coursePageData.totalLessons) * 100);
     
     completedLessons.textContent = completed;
     progressPercent.textContent = `${progress}%`;
     progressFill.style.width = `${progress}%`;
     
-    courseData.progress = progress;
+    coursePageData.progress = progress;
 }
 
 // Show locked lesson modal
@@ -420,23 +363,23 @@ completeBtn.addEventListener('click', () => {
 });
 
 nextBtn.addEventListener('click', () => {
-    if (currentLessonIndex < courseData.lessons.length - 1) {
+    if (currentLessonIndex < coursePageData.lessons.length - 1) {
         loadLesson(currentLessonIndex + 1);
     }
 });
 
 // Complete current lesson
 function completeCurrentLesson() {
-    const lesson = courseData.lessons[currentLessonIndex];
-    
+    const lesson = coursePageData.lessons[currentLessonIndex];
+
     if (lesson.completed) return;
-    
+
     // Mark lesson as completed
     lesson.completed = true;
-    
+
     // Unlock next lesson if exists
-    if (currentLessonIndex < courseData.lessons.length - 1) {
-        courseData.lessons[currentLessonIndex + 1].locked = false;
+    if (currentLessonIndex < coursePageData.lessons.length - 1) {
+        coursePageData.lessons[currentLessonIndex + 1].locked = false;
     }
     
     // Update progress
@@ -453,7 +396,7 @@ function completeCurrentLesson() {
     showNotification('Lesson completed!', 'success');
     
     // If course is complete, show celebration
-    if (courseData.progress === 100) {
+    if (coursePageData.progress === 100) {
         setTimeout(() => {
             alert('🎉 Congratulations! You have completed this course!');
         }, 1000);

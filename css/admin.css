@@ -1,0 +1,42 @@
+/* Minimal admin styles to support html/admin.html */
+:root{
+    --admin-bg: #ffffff;
+    --admin-panel: #f8fafc;
+    --accent: #3b82f6;
+    --muted: #6b7280;
+}
+
+.admin-container{
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 20px;
+    background: var(--admin-panel);
+    border-radius: 10px;
+}
+
+.admin-header{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.admin-title{ font-size:24px; margin:0; }
+.admin-subtitle{ color:var(--muted); margin:0; font-size:14px; }
+
+.admin-toolbar{ display:flex; gap:8px; margin:14px 0; }
+
+.admin-table-container{ overflow:auto; border-radius:8px; background:#fff; padding:8px; box-shadow:0 1px 3px rgba(15,23,42,0.04); }
+.admin-table{ width:100%; border-collapse:collapse; }
+.admin-table th, .admin-table td{ padding:12px 10px; border-bottom:1px solid #eef2f7; text-align:left; }
+.admin-table thead th{ background:transparent; color:#111827; font-weight:600; }
+
+.admin-input, .admin-select{ width:100%; padding:8px 10px; border:1px solid #e6edf3; border-radius:6px; background:#fff; }
+.filter-bar{ margin:12px 0 20px 0; }
+.form-row{ margin-bottom:10px; }
+
+.btn-group .btn{ margin-right:6px; }
+
+.fab{ position:fixed; right:24px; bottom:24px; background:var(--accent); color:#fff; padding:12px 14px; border-radius:999px; text-decoration:none; box-shadow:0 6px 18px rgba(59,130,246,0.18); }
+
+.empty-state{ color:var(--muted); }
+
+/* small responsive tweaks */
+@media (max-width:800px){
+    .admin-container{ padding:12px; margin:10px; }
+    .admin-toolbar{ flex-wrap:wrap; }
+}
